@@ -1,0 +1,44 @@
+services:
+  docker-daemon-1:
+    image: docker:dind
+    hostname: docker-daemon-1
+    privileged: true
+    environment:
+      - DOCKER_TLS_CERTDIR=
+    networks:
+      - docker-network
+    command: --tls=false
+
+  docker-daemon-2:
+    image: docker:dind
+    hostname: docker-daemon-2
+    privileged: true
+    environment:
+      - DOCKER_TLS_CERTDIR=
+    networks:
+      - docker-network
+    command: --tls=false      
+
+  haproxy:
+    image: haproxy:latest
+    volumes:
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    ports:
+      - "2375:2375"
+    networks:
+      - docker-network
+    depends_on:
+      - docker-daemon-1
+      - docker-daemon-2
+
+  sut:
+    build: ./client
+    environment:
+      - DOCKER_HOST=http://haproxy:2375
+    networks:
+      - docker-network
+    depends_on:
+      - haproxy
+
+networks:
+  docker-network:

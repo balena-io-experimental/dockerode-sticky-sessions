@@ -1,0 +1,12 @@
+{
+    "name": "dockerode-client",
+    "version": "1.0.0",
+    "description": "Dockerode client with custom headers",
+    "main": "index.js",
+    "scripts": {
+      "start": "node index.js"
+    },
+    "dependencies": {
+      "dockerode": "^4.0.2"
+    }
+  }
