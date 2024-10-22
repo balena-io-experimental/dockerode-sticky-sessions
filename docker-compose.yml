@@ -1,23 +1,69 @@
 services:
-  docker-daemon-1:
+  # Group A Docker Daemons
+  docker-daemon-a1:
     image: docker:dind
-    hostname: docker-daemon-1
     privileged: true
     environment:
       - DOCKER_TLS_CERTDIR=
+    hostname: docker-daemon-a1
+    healthcheck:
+      test: ["CMD", "docker", "info"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
       - docker-network
-    command: --tls=false
+    labels:
+      - "group=a"
 
-  docker-daemon-2:
+  docker-daemon-a2:
     image: docker:dind
-    hostname: docker-daemon-2
     privileged: true
     environment:
       - DOCKER_TLS_CERTDIR=
+    hostname: docker-daemon-a2
+    healthcheck:
+      test: ["CMD", "docker", "info"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
       - docker-network
-    command: --tls=false      
+    labels:
+      - "group=a"
+
+  # Group B Docker Daemons
+  docker-daemon-b1:
+    image: docker:dind
+    privileged: true
+    environment:
+      - DOCKER_TLS_CERTDIR=
+    hostname: docker-daemon-b1
+    healthcheck:
+      test: ["CMD", "docker", "info"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - docker-network
+    labels:
+      - "group=b"
+
+  docker-daemon-b2:
+    image: docker:dind
+    privileged: true
+    environment:
+      - DOCKER_TLS_CERTDIR=
+    hostname: docker-daemon-b2
+    healthcheck:
+      test: ["CMD", "docker", "info"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - docker-network
+    labels:
+      - "group=b"
 
   haproxy:
     image: haproxy:latest
@@ -28,8 +74,14 @@ services:
     networks:
       - docker-network
     depends_on:
-      - docker-daemon-1
-      - docker-daemon-2
+      docker-daemon-a1:
+        condition: service_healthy
+      docker-daemon-a2:
+        condition: service_healthy
+      docker-daemon-b1:
+        condition: service_healthy
+      docker-daemon-b2:
+        condition: service_healthy
 
   sut:
     build: ./client
