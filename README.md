@@ -4,7 +4,7 @@ This project demonstrates using Dockerode with custom headers to maintain sticky
 
 ## Components
 
-1. Two Docker daemons running in separate containers
+1. Four Docker daemons running in separate containers
 2. HAProxy for load balancing and maintaining sticky sessions
 3. Node.js client using Dockerode with custom headers
 
@@ -26,8 +26,10 @@ This project demonstrates using Dockerode with custom headers to maintain sticky
 
 ## How it works
 
-- The Node.js client generates a unique client ID and sends it as a custom header (`X-Docker-Client-ID`) with each request.
-- HAProxy uses this header to maintain sticky sessions, ensuring that each client always connects to the same Docker daemon.
+- The Node.js client generates a unique client ID and sends it as a custom header (`X-Balena-Build-ID`) with each request.
+- The Node.js client selects a build group, either A or B, and sends it as a custom header (`X-Balena-Build-Group`) with each request.
+- HAProxy uses the build group header to select a backend group, like a subset of Docker daemons.
+- HAProxy uses the build ID header to maintain sticky sessions, ensuring that each client always connects to the same Docker daemon.
 - You can verify this by checking the logs and seeing that each client ID consistently lists the same server.
 
 ## Modifying the setup
